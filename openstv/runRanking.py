@@ -222,8 +222,11 @@ for rank in range(lastRank, 0, -1):
     cProfile.run('e = doElection(reps)', profilefile)
   else:
     e = doElection()
+  
+  print "<h3>Round %d</h3>" % (lastRank - rank + 1)
   r = reports[reportformat](e)
   r.generateReport()
+  
   if profile:
     p = pstats.Stats(profilefile)
     p.strip_dirs().sort_stats('time').print_stats(50)
@@ -259,7 +262,6 @@ for rank in range(lastRank, 0, -1):
     finalRanking[1] = winnerName
     break;
   else:
-
     updateBallots(cleanBallots, eliminated, rank)
 
 print """<br>
