@@ -1,3 +1,4 @@
+
 "Plugin module for generating a concise report in HTML format."
 
 ## Copyright (C) 2003-2010 Jeffrey O'Neill
@@ -65,14 +66,7 @@ class HtmlReport(ReportPlugin):
 <body>
 <h3 class="title">%s</h3>
 <p class="overview">
-OpenSTV version %s (http://www.OpenSTV.org/)<br>
-<br>
-Suggested donation for using OpenSTV for an election is $50.  Please go to<br>
-http://www.OpenSTV.org/donate to donate via PayPal, Google Checkout, or<br>
-Amazon Payments.<br>
-<br>
-Certified election reports are also available.  Please go to<br>
-http://www.openstv.org/certified-reports for more information.<br>
+OpenSTV version %s (http://www.OpenSTV.org/)
 <br>
 Loading ballots from file %s.<br>
 Ballot file contains %d candidates and %d ballots.<br>
