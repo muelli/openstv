@@ -4,6 +4,11 @@ ballots/
 # Profiling file
 profile.out
 
+# Report files
+*.html
+*.txt
+*.csv
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
