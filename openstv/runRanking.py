@@ -32,19 +32,20 @@ stringRE = re.compile(r'^\s*"([^"]+)"\s*(?:#.*)?$')
 
 """ tmp folder for intermediate ballot files """
 BALLOTS_DIR = 'tmp_ballots/'
-
+genTmpBallots = False
 
 usage = """
 Usage:
 
   runElection.py [-p prec] [-r report] [-t tiebreak] [-w weaktie] [-s seats] 
-                 [-P] [-x reps] method ballotfile
+                 [-P] [-D] [-x reps] method ballotfile
 
   -p: override default precision (in digits)
   -r: report format: %s
   -t: strong tie-break method: random*, alpha, index
   -w: weak tie-break method: (method-default)*, strong, forward, backward 
   -P: profile and send output to profile.out
+  -D: generate intermediate ballots for ranking iteration
   -x: specify repeat count (for profiling)
     *default
 
@@ -57,7 +58,7 @@ Usage:
 
 # Parse the command line.
 try:
-  (opts, args) = getopt.getopt(sys.argv[1:], "Pp:r:t:w:x:")
+  (opts, args) = getopt.getopt(sys.argv[1:], "DPp:r:t:w:x:")
 except getopt.GetoptError, err:
   print str(err) # will print something like "option -a not recognized"
   print usage
@@ -103,6 +104,8 @@ for o, a in opts:
     profilefile = "profile.out"
   if o == "-x":
     reps = int(a)
+  if o == "-D":
+    genTmpBallots = True
 
 if len(args) != 2:
   if len(args) < 2:
@@ -200,7 +203,7 @@ def alterBallots(ballots, loser):
     out = stringRE.match(line)
     if out is not None:
       if candidateIndex != -1: # excluded candidate not met yet
-        if candidateIndex == loser:
+        if candidateIndex == loser - 1: ## Candidate names are 0-indexed !!!!!!
           candidateIndex = -1
           continue # Skip this candidate since they have been excluded
         else:
@@ -226,36 +229,51 @@ def alterBallots(ballots, loser):
   return dirtyBallots
 
 
-# Create ballots
+def withdraweCandidates(currentBallots, withdrawn):
+  """ Alter ballots by withdrawing excluded candidates """
+  dirtyTmpBallots = Ballots()
+  dirtyTmpBallots.loadKnown(bltFn, exclude0=False)
+  dirtyTmpBallots.numSeats = currentBallots.numSeats - 1
+  dirtyTmpBallots.withdrawn = withdrawn
+  return dirtyTmpBallots.getCleanBallots()
+
+
+
 try:
+
+  # Prepare list for excluded candidate
+  withdrawn = []
 
   dirtyBallots = Ballots()
   dirtyBallots.loadKnown(bltFn, exclude0=False)
-  lastRank = dirtyBallots.getNumCandidates()
-  initialBallots = dirtyBallots.getCleanBallots()
+  dirtyBallots.numSeats = dirtyBallots.getNumCandidates() - 1  
+  currentBallots = dirtyBallots.getCleanBallots()
 
-  for i in reversed(xrange(lastRank)):
-    names = initialBallots.getNames()
-    e = doElection(initialBallots)
+  while True:
+    e = doElection(currentBallots)
 
     r = reports[reportformat](e)
     r.generateReport()
 
     loser = e.losers.pop()
-    print i+1, names[loser]
+    withdrawn.append(loser)
+
+    names = currentBallots.getNames()
+    print 'loser', names[loser]
 
     if (len(e.winners) == 1):
-      print i, names[e.winners.pop()]
+      #print i, names[e.winners.pop()]
       break
 
-    initialBallots = alterBallots(initialBallots, loser)
-  # print "Rank", lastRank, ":", initalBallots.getNames()[e.losers.pop()]
+    if genTmpBallots:
+      currentBallots = alterBallots(currentBallots, loser + 1) ## ballots are 1-indexed !!!!
+    else:      
+      currentBallots = withdraweCandidates(currentBallots, withdrawn)
+
 
 except RuntimeError, msg:
   print msg
   sys.exit(1)
-
-
 
 
 # if profile:
