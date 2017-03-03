@@ -238,7 +238,6 @@ def withdraweCandidates(currentBallots, withdrawn):
   return dirtyTmpBallots.getCleanBallots()
 
 
-
 try:
 
   # Prepare list for excluded candidate
@@ -259,10 +258,8 @@ try:
     withdrawn.append(loser)
 
     names = currentBallots.getNames()
-    print 'loser', names[loser]
 
     if (len(e.winners) == 1):
-      #print i, names[e.winners.pop()]
       break
 
     if genTmpBallots:
