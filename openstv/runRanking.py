@@ -66,7 +66,7 @@ except getopt.GetoptError, err:
 
 profile = False
 reps = 1
-reportformat = "TextReport"
+reportformat = "NoReport"
 strongTieBreakMethod = None
 weakTieBreakMethod = None
 #numSeats = None
@@ -228,6 +228,11 @@ def alterBallots(ballots, loser):
   dirtyBallots.loadKnown(newFileName, exclude0=False)
   return dirtyBallots
 
+def printRank(rank, candidate):
+  if (reportformat == 'HtmlReport'):
+    print '<h3>%d - %s</h3>' % (rank, candidate)
+  else:
+    print '%d - %s' % (rank, candidate)
 
 def withdraweCandidates(currentBallots, withdrawn):
   """ Alter ballots by withdrawing excluded candidates """
@@ -237,7 +242,6 @@ def withdraweCandidates(currentBallots, withdrawn):
   dirtyTmpBallots.withdrawn = withdrawn
   return dirtyTmpBallots.getCleanBallots()
 
-
 try:
 
   # Prepare list for excluded candidate
@@ -245,27 +249,49 @@ try:
 
   dirtyBallots = Ballots()
   dirtyBallots.loadKnown(bltFn, exclude0=False)
-  dirtyBallots.numSeats = dirtyBallots.getNumCandidates() - 1  
+  dirtyBallots.numSeats = dirtyBallots.getNumCandidates() - 1 
   currentBallots = dirtyBallots.getCleanBallots()
+  initalNames = currentBallots.getNames()
+  rank = dirtyBallots.numSeats + 1
+
+  if (reportformat == 'HtmlReport'):
+    print '<h1>%s</h1>' % currentBallots.title
+
+  currentBallots.title = 'Round %d' % rank
 
   while True:
     e = doElection(currentBallots)
 
-    r = reports[reportformat](e)
-    r.generateReport()
+    if reportformat != 'NoReport':
+      r = reports[reportformat](e)
+      r.generateReport()
 
     loser = e.losers.pop()
-    withdrawn.append(loser)
+    excludedName = currentBallots.getNames()[loser]
 
-    names = currentBallots.getNames()
+    excludedIndex = 0
+    for i in xrange(len(initalNames)):
+      if initalNames[i] == excludedName:
+        excludedIndex = i
 
+    printRank(rank, excludedName)
     if (len(e.winners) == 1):
+      printRank(rank - 1, currentBallots.getNames()[e.winners.pop()])
       break
+
+    if excludedIndex in withdrawn:
+      print 'ERROR', excludedIndex, 'was already excluded'
+      sys.exit(1)
+    else:
+      withdrawn.append(excludedIndex)
 
     if genTmpBallots:
       currentBallots = alterBallots(currentBallots, loser + 1) ## ballots are 1-indexed !!!!
     else:      
       currentBallots = withdraweCandidates(currentBallots, withdrawn)
+      currentBallots.title = 'Round %d' % int(currentBallots.getNumCandidates())
+
+    rank -= 1
 
 
 except RuntimeError, msg:
