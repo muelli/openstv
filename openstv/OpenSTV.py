@@ -181,7 +181,6 @@ class Frame(wx.Frame):
     self.console = wx.TextCtrl(self.notebook, -1,
                                style=wx.TE_MULTILINE|wx.TE_READONLY|\
                                wx.TE_WORDWRAP|wx.FIXED|wx.TE_RICH2)
-    self.console.SetMaxLength(0)
     ps = self.console.GetFont().GetPointSize()
     font = wx.Font(ps, wx.MODERN, wx.NORMAL, wx.NORMAL)
     self.console.SetFont(font)
@@ -384,7 +383,6 @@ to www.OpenSTV.org, or send an email to OpenSTV@googlegroups.com.
     # create a new notebook page
     tc = wx.TextCtrl(self.notebook, -1,
                      style=wx.TE_MULTILINE|wx.TE_READONLY|wx.HSCROLL|wx.FIXED)
-    tc.SetMaxLength(0)
     ps = tc.GetFont().GetPointSize()
     font = wx.Font(ps, wx.MODERN, wx.NORMAL, wx.NORMAL)
     tc.SetFont(font)

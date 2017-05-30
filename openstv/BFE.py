@@ -96,7 +96,6 @@ class BFEFrame(wx.Frame):
     self.log = wx.TextCtrl(nb, -1,
                            style=wx.TE_MULTILINE|wx.TE_READONLY|\
                            wx.TE_WORDWRAP|wx.FIXED)
-    self.log.SetMaxLength(0)
     nb.AddPage(self.log, "Log")
 
     # Initialize
