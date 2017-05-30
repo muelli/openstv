@@ -85,4 +85,15 @@ setup(name = name,
       url = url,
       license = license,
       packages = packages,
+      package_data={'openstv': ['*.png']},
+      include_package_data = True,
+      entry_points = {
+        'console_scripts': [
+            'ostv-run-election = openstv.runElection',
+            'ostv-run-ranking = openstv.runRanking',
+        ],
+        'gui_scripts': [
+            'openstv = openstv.OpenSTV:main',
+        ],
+      },
       )
