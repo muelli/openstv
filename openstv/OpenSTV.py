@@ -904,8 +904,13 @@ class App(wx.App):
     self.SetTopWindow(self.frame)
     return True
 
+
+def main():
+  app = App(0)
+  app.MainLoop()
+
+
 ##################################################################
 
 if __name__ == '__main__':
-  app = App(0)
-  app.MainLoop()
+  main()
